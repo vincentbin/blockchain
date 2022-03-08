@@ -23,6 +23,7 @@
 hs_err_pid*
 
 # Intellij #
+*.mvn
 *.iml
 .idea
 .idea_modules/

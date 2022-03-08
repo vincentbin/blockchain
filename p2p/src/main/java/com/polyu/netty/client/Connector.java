@@ -1,7 +1,8 @@
 package com.polyu.netty.client;
 
 import com.polyu.netty.NettyChannelInitializer;
-import com.polyu.wrapper.Message;
+import com.polyu.netty.PeerServerConnectKeeper;
+import com.polyu.wrapper.RegistryPackage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -32,9 +33,7 @@ public class Connector {
                 if (channelFuture.isSuccess()) {
                     logger.info("client connect server succeed.");
                     Channel channel = channelFuture.channel();
-                    Message message = new Message();
-                    message.setClientInitMsg(true);
-                    channel.writeAndFlush(message);
+                    PeerServerConnectKeeper.add(channel, new RegistryPackage(serverIp, serverPort));
                 } else {
                     logger.error("client connect server failed.");
                 }

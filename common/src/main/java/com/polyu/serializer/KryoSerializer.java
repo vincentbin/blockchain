@@ -41,11 +41,11 @@ public class KryoSerializer implements Serializer {
         try {
             kryo.writeObject(out, obj);
             out.close();
-            return byteArrayOutputStream.toByteArray();
         } finally {
             byteArrayOutputStream.close();
             pool.release(kryo);
         }
+        return byteArrayOutputStream.toByteArray();
     }
 
     @Override
@@ -53,13 +53,14 @@ public class KryoSerializer implements Serializer {
         Kryo kryo = pool.borrow();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Input in = new Input(byteArrayInputStream);
+        Object result;
         try {
-            Object result = kryo.readObject(in, clazz);
+            result = kryo.readObject(in, clazz);
             in.close();
-            return result;
         } finally {
             byteArrayInputStream.close();
             pool.release(kryo);
         }
+        return result;
     }
 }

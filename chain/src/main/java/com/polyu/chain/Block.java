@@ -3,12 +3,14 @@ package com.polyu.chain;
 
 import com.polyu.chain.transaction.Transaction;
 import com.polyu.chain.utils.StringUtil;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+@Data
 public class Block {
     private static final Logger log = LoggerFactory.getLogger(Block.class);
 
@@ -19,33 +21,34 @@ public class Block {
     public long timeStamp; //as number of milliseconds since 1/1/1970.
     public int nonce;
 
-    //Block Constructor.
+    // Block Constructor.
     public Block(String previousHash) {
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
-        this.hash = calculateHash(); //Making sure we do this after we set the other values.
     }
 
-    //Calculate new hash based on blocks contents
+    // Calculate new hash based on blocks contents
     public String calculateHash() {
         return StringUtil.applySha256(previousHash + timeStamp + nonce + merkleRoot);
     }
 
-    //Increases nonce value until hash target is reached.
+    // Increases nonce value until hash target is reached.
     public void mineBlock(int difficulty) {
         merkleRoot = StringUtil.getMerkleRoot(transactions);
-        String target = StringUtil.getDificultyString(difficulty); //Create a string with difficulty * "0"
-        while (!hash.substring(0, difficulty).equals(target)) {
+        String target = StringUtil.getDifficultyString(difficulty); //Create a string with difficulty * "0"
+        while (hash == null || !hash.substring(0, difficulty).equals(target)) {
             nonce++;
             hash = calculateHash();
         }
-        log.info("Block Mined!!! : {}", hash);
+        log.info("Block Mined!!! : {}.", hash);
     }
 
-    //Add transactions to this block
+    // Add transactions to this block
     public boolean addTransaction(Transaction transaction) {
-        //process transaction and check if valid, unless block is genesis block then ignore.
-        if (transaction == null) return false;
+        // process transaction and check if valid, unless block is genesis block then ignore.
+        if (transaction == null) {
+            return false;
+        }
         if ((previousHash != "0")) {
             if (!transaction.processTransaction()) {
                 log.info("Transaction failed to process. Discarded.");

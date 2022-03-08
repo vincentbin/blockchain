@@ -40,12 +40,12 @@ public class Transaction {
             return false;
         }
 
-        //Gathers transaction inputs (Making sure they are unspent):
+        // Gathers transaction inputs (Making sure they are unspent):
         for (Input i : inputs) {
             i.UTXO = MainChain.getUTXOs().get(i.transactionOutputId);
         }
 
-        //Checks if transaction is valid:
+        // Checks if transaction is valid:
         if (getInputsValue() < minimumTransaction) {
             log.info("Transaction Inputs to small: " + getInputsValue());
             return false;
@@ -57,14 +57,14 @@ public class Transaction {
         outputs.add(new Output(this.recipient, value, transactionId)); //send value to recipient
         outputs.add(new Output(this.sender, leftOver, transactionId)); //send the left over 'change' back to sender
 
-        //Add outputs to Unspent list
+        // Add outputs to Unspent list
         for (Output o : outputs) {
             MainChain.getUTXOs().put(o.id, o);
         }
 
-        //Remove transaction inputs from UTXO lists as spent:
+        // Remove transaction inputs from UTXO lists as spent:
         for (Input i : inputs) {
-            if (i.UTXO == null) continue; //if Transaction can't be found skip it
+            if (i.UTXO == null) continue; // if Transaction can't be found skip it
             MainChain.getUTXOs().remove(i.UTXO.id);
         }
 
@@ -74,19 +74,21 @@ public class Transaction {
     public float getInputsValue() {
         float total = 0;
         for (Input i : inputs) {
-            if (i.UTXO == null) continue; //if Transaction can't be found skip it, This behavior may not be optimal.
+            if (i.UTXO == null) {
+                continue; // if Transaction can't be found skip it, This behavior may not be optimal.
+            }
             total += i.UTXO.value;
         }
         return total;
     }
 
     public void generateSignature(PrivateKey privateKey) {
-        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient) + Float.toString(value);
+        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient) + value;
         signature = StringUtil.applyECDSASig(privateKey, data);
     }
 
     public boolean verifySignature() {
-        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient) + Float.toString(value);
+        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient) + value;
         return StringUtil.verifyECDSASig(sender, data, signature);
     }
 

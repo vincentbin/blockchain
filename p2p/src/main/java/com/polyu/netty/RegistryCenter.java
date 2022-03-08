@@ -2,7 +2,6 @@ package com.polyu.netty;
 
 import com.polyu.config.NameSpaceEnum;
 import com.polyu.netty.client.Connector;
-import com.polyu.netty.server.PeerServerConnectKeeper;
 import com.polyu.registry.CuratorClient;
 import com.polyu.wrapper.RegistryPackage;
 import lombok.SneakyThrows;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class RegistryCenter {
     private static final Logger logger = LoggerFactory.getLogger(RegistryCenter.class);
@@ -54,10 +52,12 @@ public class RegistryCenter {
                 switch (type) {
                     case CHILD_ADDED:
                         RegistryPackage rpAdd = RegistryPackage.fromJson(new String(childData.getData(), StandardCharsets.UTF_8));
+                        // connect new node
                         Connector.connect(rpAdd.getHost(), rpAdd.getPort());
                         break;
                     case CHILD_REMOVED:
                         RegistryPackage rpRemove = RegistryPackage.fromJson(new String(childData.getData(), StandardCharsets.UTF_8));
+                        // p2p delete removed node
                         PeerServerConnectKeeper.remove(rpRemove);
                         break;
                 }
@@ -84,18 +84,5 @@ public class RegistryCenter {
         }
         this.zkClient.close();
     }
-
-//    public void pullServerInfo() throws Exception {
-//        if (!zkClient.checkPath(NameSpaceEnum.ZK_REGISTRY_PATH.getValue())) {
-//            return;
-//        }
-//        List<String> nodeList = zkClient.getChildren(NameSpaceEnum.ZK_REGISTRY_PATH.getValue());
-//        for (String node : nodeList) {
-//            byte[] bytes = zkClient.getData(NameSpaceEnum.ZK_REGISTRY_PATH.getValue().concat("/").concat(node));
-//            String json = new String(bytes);
-//            RegistryPackage registryPackage = RegistryPackage.fromJson(json);
-//            NettyPeerServerConnector.connect(registryPackage.getHost(), registryPackage.getPort());
-//        }
-//    }
 
 }

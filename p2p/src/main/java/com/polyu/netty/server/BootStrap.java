@@ -9,18 +9,19 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.NettyRuntime;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BootStrap implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(BootStrap.class);
 
-    private String serverAddress;
-    private RegistryCenter registry;
+    private static String serverAddress;
+    private static RegistryCenter registry;
 
     public BootStrap(String serverAddress, String registryAddress) {
-        this.serverAddress = serverAddress;
-        this.registry = new RegistryCenter(registryAddress);
+        BootStrap.serverAddress = serverAddress;
+        BootStrap.registry = new RegistryCenter(registryAddress);
     }
 
     public void run() {
@@ -50,4 +51,7 @@ public class BootStrap implements Runnable {
         }
     }
 
+    public static String getServerAddress() {
+        return serverAddress;
+    }
 }
