@@ -11,6 +11,7 @@
     <modules>
         <module>chain</module>
         <module>common</module>
+        <module>p2p</module>
     </modules>
 
     <properties>
@@ -18,6 +19,10 @@
         <lombok.version>1.18.4</lombok.version>
         <gson.version>2.8.2</gson.version>
         <bouncycastle.version>1.59</bouncycastle.version>
+        <netty.version>4.1.42.Final</netty.version>
+        <kryo.version>4.0.2</kryo.version>
+        <curator.version>2.13.0</curator.version>
+        <jackson.version>2.12.1</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -47,6 +52,30 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>${kryo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
