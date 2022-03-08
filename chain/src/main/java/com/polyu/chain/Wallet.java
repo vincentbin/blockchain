@@ -3,6 +3,8 @@ package com.polyu.chain;
 import com.polyu.chain.transaction.Input;
 import com.polyu.chain.transaction.Output;
 import com.polyu.chain.transaction.Transaction;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Data
 public class Wallet {
     private static final Logger log = LoggerFactory.getLogger(Wallet.class);
 
@@ -34,6 +36,15 @@ public class Wallet {
         generateKeyPair();
     }
 
+    public Wallet(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public Wallet(PrivateKey privateKey, PublicKey publicKey) {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
+    }
+
     public void generateKeyPair() {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_PAIR_ALG, KEY_PAIR_ALG_PROVIDER);
@@ -43,18 +54,18 @@ public class Wallet {
             KeyPair keyPair = keyGen.generateKeyPair();
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public float getBalance() {
-        float total = 0;
+        float total = 0.0f;
         for (Map.Entry<String, Output> item : MainChain.UTXOs.entrySet()) {
             Output UTXO = item.getValue();
-            if (UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
-                UTXOs.put(UTXO.id, UTXO); //add it to our list of unspent transactions.
+            if (UTXO.isMine(publicKey)) {
+                // add it to our list of unspent transactions.
+                UTXOs.put(UTXO.id, UTXO);
                 total += UTXO.value;
             }
         }

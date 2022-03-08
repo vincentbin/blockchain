@@ -3,10 +3,13 @@ package com.polyu.chain;
 import com.polyu.chain.transaction.Input;
 import com.polyu.chain.transaction.Output;
 import com.polyu.chain.transaction.Transaction;
-import org.omg.CORBA.DynAnyPackage.Invalid;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,19 +19,19 @@ public class MainChain {
     private static ArrayList<Block> blockChain = new ArrayList<>();
     static HashMap<String, Output> UTXOs = new HashMap<>();
 
-    private static int difficulty = 3;
+    private static int difficulty = 5;
     private static Wallet walletA;
     private static Wallet walletB;
     private static Transaction genesisTransaction;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 
         //Create wallets:
         walletA = new Wallet();
         walletB = new Wallet();
         Wallet coinbase = new Wallet();
 
-        //create genesis transaction, which sends 100 NoobCoin to walletA:
+        // create genesis transaction, which sends 100 NoobCoin to walletA:
         genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 100f, null);
         genesisTransaction.generateSignature(coinbase.privateKey);     //manually sign the genesis transaction
         genesisTransaction.transactionId = "0"; //manually set the transaction id
@@ -40,7 +43,7 @@ public class MainChain {
         genesis.addTransaction(genesisTransaction);
         addBlock(genesis);
 
-        //testing
+        // testing
         Block block1 = new Block(genesis.hash);
         log.info("WalletA's balance is: {}", walletA.getBalance());
         log.info("WalletA is Attempting to send funds (40) to WalletB.");
@@ -73,31 +76,31 @@ public class MainChain {
         Block currentBlock;
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-        HashMap<String, Output> tempUTXOs = new HashMap<>(); //a temporary working list of unspent transactions at a given block state.
+        HashMap<String, Output> tempUTXOs = new HashMap<>(); // a temporary working list of unspent transactions at a given block state.
         tempUTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
 
-        //loop through block chain to check hashes:
+        // loop through block chain to check hashes:
         for (int i = 1; i < blockChain.size(); i++) {
 
             currentBlock = blockChain.get(i);
             previousBlock = blockChain.get(i - 1);
-            //compare registered hash and calculated hash:
+            // compare registered hash and calculated hash:
             if (!currentBlock.hash.equals(currentBlock.calculateHash())) {
                 log.info("Current Hashes not equal");
                 return false;
             }
-            //compare previous hash and registered previous hash
+            // compare previous hash and registered previous hash
             if (!previousBlock.hash.equals(currentBlock.previousHash)) {
                 log.info("Previous Hashes not equal");
                 return false;
             }
-            //check if hash is solved
-            if (!currentBlock.hash.substring(0, difficulty).equals(hashTarget)) {
+            // check if hash is solved
+            if (currentBlock.hash == null || !currentBlock.hash.substring(0, difficulty).equals(hashTarget)) {
                 log.info("This block hasn't been mined");
                 return false;
             }
 
-            //loop thru blockchains transactions:
+            // loop block chain's transactions:
             Output tempOutput;
             for (int t = 0; t < currentBlock.transactions.size(); t++) {
                 Transaction currentTransaction = currentBlock.transactions.get(t);
@@ -132,7 +135,7 @@ public class MainChain {
                 }
 
                 if (currentTransaction.outputs.get(0).recipient != currentTransaction.recipient) {
-                    log.info("Transaction({}) output reciepient is not who it should be", t);
+                    log.info("Transaction({}) output recipient is not who it should be", t);
                     return false;
                 }
                 if (currentTransaction.outputs.get(1).recipient != currentTransaction.sender) {
@@ -143,7 +146,7 @@ public class MainChain {
             }
 
         }
-        log.info("Blockchain is valid");
+        log.info("Blockchain is valid.");
         return true;
     }
 
@@ -152,8 +155,15 @@ public class MainChain {
         blockChain.add(newBlock);
     }
 
+    public static void add(Block newBlock) {
+        blockChain.add(newBlock);
+    }
+
     public static HashMap<String, Output> getUTXOs() {
         return UTXOs;
     }
 
+    public static ArrayList<Block> getBlockChain() {
+        return blockChain;
+    }
 }

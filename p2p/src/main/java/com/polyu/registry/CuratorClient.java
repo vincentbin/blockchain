@@ -30,15 +30,6 @@ public class CuratorClient {
         this(connectString, NameSpaceEnum.ZK_NAME_SPACE.getValue(), timeout, timeout);
     }
 
-    CuratorClient(String connectString) {
-        this(
-                connectString,
-                NameSpaceEnum.ZK_NAME_SPACE.getValue(),
-                NameSpaceEnum.ZK_SESSION_TIMEOUT.getTimeOutLength(),
-                NameSpaceEnum.ZK_CONNECTION_TIMEOUT.getTimeOutLength()
-        );
-    }
-
     public boolean checkPath(String path) throws Exception {
         Stat status = client.checkExists().forPath(path);
         return status != null;
