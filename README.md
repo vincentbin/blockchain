@@ -14,3 +14,13 @@
 #### 服务启动
 - BlockChainApplication.java为启动类，properties文件可修改启动端口
 - netty服务通过spring ApplicationContextAware的setApplicationContext带起，在此类可以设置netty启动地址以及注册中心地址。
+#### 配置
+- application.properties
+```properties
+# springboot 启动端口
+server.port=8080
+# 提供服务的机器ip & port
+server.netty.local.address=127.0.0.1:8000
+# 注册中心地址
+server.netty.registry.address=127.0.0.1:2181
+```
