@@ -1,8 +1,10 @@
 package com.polyu.chain;
 
+import com.polyu.chain.facade.impl.BlockChainServiceImp;
 import com.polyu.chain.transaction.Input;
 import com.polyu.chain.transaction.Output;
 import com.polyu.chain.transaction.Transaction;
+import com.polyu.util.KeyUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,31 @@ public class MainChain {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 
+
+        walletA = new Wallet();
+        Wallet coinbase = new Wallet();
+        genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 1000f, null);
+        genesisTransaction.generateSignature(coinbase.privateKey);     //manually sign the genesis transaction
+        genesisTransaction.transactionId = "0"; //manually set the transaction id
+        genesisTransaction.outputs.add(new Output(genesisTransaction.recipient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
+        UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
+
+        log.info("Creating and Mining Genesis block.");
+        Block genesis = new Block("0");
+        genesis.addTransaction(genesisTransaction);
+        addBlock(genesis);
+        log.info("init wallet public key: {}.", KeyUtil.PublicKeyToString(walletA.publicKey));
+        log.info("init wallet public key: {}.", KeyUtil.PrivateKeyToString(walletA.privateKey));
+
+        walletB = new Wallet();
+
+        BlockChainServiceImp blockChainServiceImp = new BlockChainServiceImp();
+        blockChainServiceImp.transfer(KeyUtil.PublicKeyToString(walletA.publicKey),
+                KeyUtil.PrivateKeyToString(walletA.privateKey),
+                KeyUtil.PublicKeyToString(walletB.publicKey), 100);
+        float balance = blockChainServiceImp.getBalance(KeyUtil.PublicKeyToString(walletB.publicKey));
+        System.out.println("balance = " + balance);
+        /**
         //Create wallets:
         walletA = new Wallet();
         walletB = new Wallet();
@@ -69,6 +96,7 @@ public class MainChain {
 
         isChainValid();
         log.info("blockchain = {}", blockChain);
+         */
 
     }
 
