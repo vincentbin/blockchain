@@ -5,7 +5,7 @@
 - 通过http restful接口接收客户请求，并将有需要的请求发布到p2p网络进行计算。
 - 在netty read接收端针对不同消息类型完成不同的业务功能。
 ## 简要架构
-<div align="center"><img src="https://github.com/vincentbin/blockchain/blob/main/structure.png" width="730" height="520" alt="微信小程序"/></div>
+<div align="center"><img src="https://github.com/vincentbin/blockchain/blob/main/structure.png" width="730" height="520" alt="架构图"/></div>
 
 ## 部署 & 启动
 #### Docker Zookeeper部署
