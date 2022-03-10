@@ -12,6 +12,7 @@ import com.polyu.blockchain.common.vo.TransferReqVo;
 import com.polyu.blockchain.common.wrapper.Result;
 import com.polyu.blockchain.p2p.netty.BusinessHandler;
 import com.polyu.blockchain.web.service.RequestService;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@AllArgsConstructor
 public class RequestController {
     private static final Logger log = LoggerFactory.getLogger(RequestController.class);
 
-    @Autowired
     private RequestService blockChainService;
 
     @RequestMapping(value = "/obtainNewAccount")
@@ -61,12 +62,13 @@ public class RequestController {
                             request.getValue());
                 }
             }).start();
-            return Result.success(true);
+            return Result.success(true, "Server started to process.");
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/init")
     public Result<Boolean> init() {
         Wallet walletA = new Wallet();

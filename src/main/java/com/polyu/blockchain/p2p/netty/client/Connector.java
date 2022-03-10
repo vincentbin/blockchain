@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
+/**
+ * 启动后 zk 增量获取新上线机器 在 Connector 进行连接
+ */
 public class Connector {
     private static final Logger logger = LoggerFactory.getLogger(Connector.class);
     private static EventLoopGroup eventLoopGroup = new NioEventLoopGroup(1);

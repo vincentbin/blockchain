@@ -47,7 +47,7 @@ public class Transaction {
 
         // Checks if transaction is valid:
         if (getInputsValue() < minimumTransaction) {
-            log.info("Transaction Inputs to small: " + getInputsValue());
+            log.warn("Transaction Inputs to small: " + getInputsValue());
             return false;
         }
 
@@ -64,7 +64,9 @@ public class Transaction {
 
         // Remove transaction inputs from UTXO lists as spent:
         for (Input i : inputs) {
-            if (i.UTXO == null) continue; // if Transaction can't be found skip it
+            if (i.UTXO == null) {
+                continue; // if Transaction can't be found skip it
+            }
             MainChain.getUTXOs().remove(i.UTXO.id);
         }
 

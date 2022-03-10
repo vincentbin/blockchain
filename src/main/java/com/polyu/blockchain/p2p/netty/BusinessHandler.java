@@ -16,24 +16,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * netty handler
+ */
 public class BusinessHandler extends ChannelInboundHandlerAdapter implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(BusinessHandler.class);
-
-    private static BusinessHandler handler;
-    private static Set<String> uuidSet = new HashSet<>();
-
-    public static BusinessHandler getInstance() {
-        if (handler == null) {
-            handler = new BusinessHandler();
-        }
-        return handler;
-    }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
+        Message message = new Message(true);
+        if (PeerServerConnectKeeper.isNeedSynChain()) {
+            message.setSynChain(true);
+        }
         Channel ch = ctx.channel();
-        ch.writeAndFlush(new Message(true));
+        ch.writeAndFlush(message);
     }
 
     @Override
@@ -45,19 +42,41 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter implements Han
             String[] address = serverAddress.split(":");
             Message rep = new Message(address[0], Integer.parseInt(address[1]));
             rep.setAddressReply(true);
+
+            if (message.isSynChain()) {
+                rep.setBlockChain(MainChain.blockChain);
+                rep.setUTXOs(MainChain.UTXOs);
+                rep.setGenesisTransaction(MainChain.genesisTransaction);
+                rep.setSynChain(true);
+            }
             ctx.channel().writeAndFlush(rep);
             return;
         }
         if (message.isAddressReply()) {
             PeerServerConnectKeeper.add(ctx.channel(), new RegistryPackage(message.getIp(), message.getPort()));
+            if (message.isSynChain()) {
+                MainChain.blockChain = message.getBlockChain();
+                MainChain.UTXOs = message.getUTXOs();
+                MainChain.genesisTransaction = message.getGenesisTransaction();
+            }
             return;
         }
         // mine request process
         if (message.isMineRequest()) {
-            uuidSet.add(message.getUuid());
+            PeerServerConnectKeeper.getUuidSet().add(message.getUuid());
             Block block = message.getContent();
             // mine
             block.mineBlock(5);
+            // add to local chain
+            MainChain.add(block);
+            if (!MainChain.isChainValid()) {
+                ArrayList<Block> blockChain = MainChain.getBlockChain();
+                blockChain.remove(blockChain.size() - 1);
+                return;
+            }
+
+            // success added, remove id, avoid others' result modify local chain
+            PeerServerConnectKeeper.getUuidSet().remove(message.getUuid());
 
             // compute hash completed -> broadcast
             Map<RegistryPackage, Channel> map = PeerServerConnectKeeper.getMap();
@@ -74,17 +93,17 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter implements Han
         // mine reply process
         if (message.isMineReply()) {
             String uuid = message.getUuid();
-            if (!uuidSet.contains(uuid)) {
+            if (!PeerServerConnectKeeper.getUuidSet().contains(uuid)) {
                 return;
             }
-            uuidSet.remove(uuid);
+            PeerServerConnectKeeper.getUuidSet().remove(uuid);
             Block block = message.getContent();
             MainChain.add(block);
             if (!MainChain.isChainValid()) {
                 ArrayList<Block> blockChain = MainChain.getBlockChain();
                 blockChain.remove(blockChain.size() - 1);
                 // unsuccessful -> continue to accept new reply
-                uuidSet.add(uuid);
+                PeerServerConnectKeeper.getUuidSet().add(uuid);
                 return;
             }
             ArrayList<Transaction> transactions = block.getTransactions();
@@ -94,6 +113,7 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter implements Han
             }
             return;
         }
+        // syn chain process
         if (message.isSynChain()) {
             MainChain.blockChain = message.getBlockChain();
             MainChain.UTXOs = message.getUTXOs();
