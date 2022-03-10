@@ -7,6 +7,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BlockChainApplication {
 
     public static void main(String[] args) {
+        // syn chain check
+        /**
+        new Thread(new Runnable() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                while (true) {
+                    Thread.sleep(3000);
+                    System.out.println("MainChain.blockChain = " + MainChain.blockChain);
+                }
+            }
+        }).start();
+         */
         SpringApplication.run(BlockChainApplication.class, args);
     }
 }

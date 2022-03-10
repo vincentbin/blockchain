@@ -1,6 +1,8 @@
 package com.polyu.blockchain.p2p.netty.server;
 
+import com.polyu.blockchain.chain.facade.impl.BlockChainServiceImp;
 import com.polyu.blockchain.p2p.netty.NettyChannelInitializer;
+import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
 import com.polyu.blockchain.p2p.netty.RegistryCenter;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -38,7 +40,12 @@ public class BootStrap implements Runnable {
             String host = array[0];
             int port = Integer.parseInt(array[1]);
             ChannelFuture future = bootstrap.bind(port).sync();
-            registry.registerService(host, port);
+            boolean empty = registry.registerService(host, port);
+            if (empty) {
+                BlockChainServiceImp.init();
+            } else {
+                PeerServerConnectKeeper.setNeedSynChain(true);
+            }
             logger.info("Server started on ip: {}, port: {}.", host, port);
             future.channel().closeFuture().sync();
         } catch (Exception e) {

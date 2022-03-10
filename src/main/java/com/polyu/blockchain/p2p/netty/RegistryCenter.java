@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class RegistryCenter {
     private static final Logger logger = LoggerFactory.getLogger(RegistryCenter.class);
@@ -28,9 +29,17 @@ public class RegistryCenter {
         this.zkClient = new CuratorClient(registryAddress, 5000);
     }
 
-    public void registerService(String host, int port) throws Exception {
+    /**
+     * register server & observer active online server
+     * @param host local ip
+     * @param port local port
+     * @return 注册前是否有活跃线上机器
+     * @throws Exception zk watch
+     */
+    public boolean registerService(String host, int port) throws Exception {
         RegistryCenter.host = host;
         RegistryCenter.port = port;
+        List<String> activeList = getServiceList();
         try {
             RegistryPackage registryPackage = new RegistryPackage();
             registryPackage.setHost(RegistryCenter.host);
@@ -74,6 +83,7 @@ public class RegistryCenter {
                 }
             }
         });
+        return activeList.isEmpty();
     }
 
     public void unregisterService() {
@@ -83,6 +93,21 @@ public class RegistryCenter {
             logger.error("Delete failed error: {}.", e.getMessage(), e);
         }
         this.zkClient.close();
+    }
+
+    /**
+     * get active server list
+     * @return server list
+     */
+    private List<String> getServiceList() {
+        List<String> nodeList = null;
+        try {
+            nodeList = zkClient.getChildren(NameSpaceEnum.ZK_REGISTRY_PATH.getValue());
+            logger.info("online server list: {}.", nodeList.toString());
+        } catch (Exception e) {
+            logger.error("Get node exception: {}.", e.getMessage());
+        }
+        return nodeList;
     }
 
 }

@@ -13,7 +13,7 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline cp = ch.pipeline();
         cp.addLast(new Decoder(KryoSerializer.getInstance()));
         cp.addLast(new Encoder(KryoSerializer.getInstance()));
-        cp.addLast(BusinessHandler.getInstance());
+        cp.addLast(new BusinessHandler());
     }
 
 }
