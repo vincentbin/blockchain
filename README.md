@@ -8,15 +8,15 @@
 <div align="center"><img src="https://github.com/vincentbin/blockchain/blob/main/img/structure.png" width="725" height="520" alt="架构图"/></div>
 
 ## 部署 & 启动
-#### Docker Zookeeper部署
+### Docker Zookeeper部署
 1. 拉取zk镜像&emsp;&emsp;&emsp;指令：docker pull zookeeper:3.4.14
 2. 查看镜像id&emsp;&emsp;&emsp;指令：docker images
 3. 拉起容器&emsp;&emsp;&emsp;&emsp;指令：docker run -d -p 2181:2181 --name b-zookeeper --restart always {imageId}
 
-#### 服务启动
+### 服务启动
 - BlockChainApplication.java为启动类，properties文件可修改启动端口
 - netty服务通过spring ApplicationContextAware的setApplicationContext带起，在此类可以设置netty启动地址以及注册中心地址。
-#### 配置
+### 配置
 - application.properties
 ```properties
 # springboot 启动端口
