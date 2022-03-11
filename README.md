@@ -2,7 +2,7 @@
 ## 简介
 - 实现了比特币block，区块链，钱包，交易的基本业务功能。
 - 通过netty搭配注册中心为namespace搭建全连接的p2p网络。
-- 通过http restful接口接收客户请求，并将有需要的请求发布到p2p网络进行计算。
+- 通过http restful接口接收客户请求，并将特定请求发布到p2p网络进行计算。
 - 在netty read接收端针对不同消息类型完成不同的业务功能。
 ## 简要架构
 <div align="center"><img src="https://github.com/vincentbin/blockchain/blob/main/img/structure.png" width="725" height="520" alt="架构图"/></div>
