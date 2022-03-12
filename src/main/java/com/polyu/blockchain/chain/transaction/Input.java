@@ -1,8 +1,19 @@
 package com.polyu.blockchain.chain.transaction;
 
+import lombok.Data;
+
+@Data
 public class Input {
-    public String transactionOutputId; //Reference to TransactionOutputs -> transactionId
-    public Output UTXO; //Contains the Unspent transaction output
+
+    /**
+     * output transactionId
+     */
+    public String transactionOutputId;
+
+    /**
+     * unspent transaction output
+     */
+    public Output UTXO;
 
     public Input(String transactionOutputId) {
         this.transactionOutputId = transactionOutputId;
