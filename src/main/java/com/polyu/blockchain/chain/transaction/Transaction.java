@@ -8,23 +8,46 @@ import org.slf4j.LoggerFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Transaction {
     private static final Logger log = LoggerFactory.getLogger(Transaction.class);
 
-    public String transactionId; //Contains a hash of transaction*
-    public PublicKey sender; //Senders address/public key.
-    public PublicKey recipient; //Recipients address/public key.
-    public float value; //Contains the amount we wish to send to the recipient.
-    private byte[] signature; //This is to prevent anybody else from spending funds in our wallet.
+    /**
+     * hash of transaction
+     */
+    public String transactionId;
+
+    /**
+     * sender's public key
+     */
+    public PublicKey sender;
+
+    /**
+     * recipient's public key
+     */
+    public PublicKey recipient;
+
+    /**
+     * transaction amount
+     */
+    public float value;
+
+    /**
+     * signature
+     */
+    private byte[] signature;
 
     public ArrayList<Input> inputs;
     public ArrayList<Output> outputs = new ArrayList<>();
 
     private static final float minimumTransaction = 0.1f;
 
-    private static int sequence = 0; //A rough count of how many transactions have been generated
+    /**
+     * transaction counter
+     */
+    private static AtomicInteger sequence = new AtomicInteger(0);
 
     public Transaction(PublicKey from, PublicKey to, float value, ArrayList<Input> inputs) {
         this.sender = from;
@@ -36,7 +59,7 @@ public class Transaction {
     public boolean processTransaction() {
 
         if (!verifySignature()) {
-            log.warn("#Transaction Signature failed to verify");
+            log.warn("Transaction Signature failed to verify.");
             return false;
         }
 
@@ -47,7 +70,7 @@ public class Transaction {
 
         // Checks if transaction is valid:
         if (getInputsValue() < minimumTransaction) {
-            log.warn("Transaction Inputs to small: " + getInputsValue());
+            log.warn("Transaction Inputs to small: {}.", getInputsValue());
             return false;
         }
 
@@ -103,9 +126,9 @@ public class Transaction {
     }
 
     private String calculateHash() {
-        sequence++; //increase the sequence to avoid 2 identical transactions having the same hash
+        sequence.incrementAndGet();
         return StringUtil.applySha256(
                 StringUtil.getStringFromKey(sender) +
-                        StringUtil.getStringFromKey(recipient) + value + sequence);
+                        StringUtil.getStringFromKey(recipient) + value + sequence.intValue());
     }
 }

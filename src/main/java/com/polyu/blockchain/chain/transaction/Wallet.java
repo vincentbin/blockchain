@@ -71,7 +71,7 @@ public class Wallet {
 
     public Transaction sendFunds(PublicKey _recipient, float value) {
         if (getBalance() < value) {
-            log.info("#Not Enough funds to send transaction. Transaction Discarded.");
+            log.warn("Not Enough funds to send transaction, transaction Discarded.");
             return null;
         }
         ArrayList<Input> inputs = new ArrayList<>();
