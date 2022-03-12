@@ -2,6 +2,7 @@ package com.polyu.blockchain.chain.transaction;
 
 import com.polyu.blockchain.chain.MainChain;
 import com.polyu.blockchain.common.util.StringUtil;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+@Data
 public class Transaction {
     private static final Logger log = LoggerFactory.getLogger(Transaction.class);
 
