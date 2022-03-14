@@ -34,8 +34,8 @@ public class MainChain {
         walletA = new Wallet();
         Wallet coinbase = new Wallet();
         genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 1000f, null);
-        genesisTransaction.generateSignature(coinbase.privateKey);     //manually sign the genesis transaction
-        genesisTransaction.transactionId = "0"; //manually set the transaction id
+        genesisTransaction.generateSignature(coinbase.privateKey);     // manually sign the genesis transaction
+        genesisTransaction.transactionId = "0"; // manually set the transaction id
         genesisTransaction.outputs.add(new Output(genesisTransaction.recipient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
         UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
 
