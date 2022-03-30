@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
-@ToString
 @NoArgsConstructor
 public class Message {
     private boolean clientInitMsg;
@@ -38,5 +37,22 @@ public class Message {
     public Message(String ip, int port) {
         this.ip = ip;
         this.port = port;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "clientInitMsg=" + clientInitMsg +
+                ", addressQuery=" + addressQuery +
+                ", addressReply=" + addressReply +
+                ", ip='" + ip + '\'' +
+                ", port=" + port +
+                ", mineRequest=" + mineRequest +
+                ", mineReply=" + mineReply +
+                ", uuid='" + uuid + '\'' +
+                ", content=" + content +
+                ", synChain=" + synChain +
+                ", blockChain=" + blockChain +
+                '}';
     }
 }

@@ -15,23 +15,17 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-/**
- * netty handler
- */
-public class BusinessHandler extends ChannelInboundHandlerAdapter implements Handler {
+public class ClientHandler extends ChannelInboundHandlerAdapter implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(BusinessHandler.class);
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
-        Message message = new Message(true);
-        if (PeerServerConnectKeeper.isNeedSynChain()) {
-            message.setSynChain(true);
-        }
-        Channel ch = ctx.channel();
-        ch.writeAndFlush(message);
     }
 
     @Override
@@ -66,7 +60,6 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter implements Han
         if (message.isMineRequest()) {
             PeerServerConnectKeeper.getUuidSet().add(message.getUuid());
             Block block = message.getContent();
-
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -151,7 +144,13 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter implements Han
             message.setMineRequest(true);
             message.setUuid(uuid);
             message.setContent(block);
-            peer.writeAndFlush(message);
+            System.out.println(peer.isActive());
+            try {
+                ChannelFuture sync = peer.writeAndFlush(message).sync();
+                System.out.println("sync = " + sync);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 

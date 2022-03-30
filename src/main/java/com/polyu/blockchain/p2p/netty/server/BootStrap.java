@@ -26,7 +26,7 @@ public class BootStrap implements Runnable {
     }
 
     public void run() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors() / 2);
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();

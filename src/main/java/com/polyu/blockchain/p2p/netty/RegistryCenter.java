@@ -4,6 +4,7 @@ import com.polyu.blockchain.common.config.NameSpaceEnum;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
 import com.polyu.blockchain.p2p.netty.client.Connector;
 import com.polyu.blockchain.p2p.registry.CuratorClient;
+import io.netty.channel.Channel;
 import lombok.SneakyThrows;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 public class RegistryCenter {
     private static final Logger logger = LoggerFactory.getLogger(RegistryCenter.class);
@@ -61,6 +63,10 @@ public class RegistryCenter {
                 switch (type) {
                     case CHILD_ADDED:
                         RegistryPackage rpAdd = RegistryPackage.fromJson(new String(childData.getData(), StandardCharsets.UTF_8));
+                        Map<RegistryPackage, Channel> map = PeerServerConnectKeeper.getMap();
+                        if (map.containsKey(rpAdd)) {
+                            break;
+                        }
                         // connect new node
                         Connector.connect(rpAdd.getHost(), rpAdd.getPort());
                         break;
