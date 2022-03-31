@@ -21,6 +21,7 @@
         <kryo.version>4.0.2</kryo.version>
         <curator.version>2.13.0</curator.version>
         <jackson.version>2.12.1</jackson.version>
+        <hessian.version>4.0.63</hessian.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -70,6 +71,13 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- hessian -->
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>${hessian.version}</version>
         </dependency>
     </dependencies>
 

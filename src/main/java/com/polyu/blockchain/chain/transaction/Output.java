@@ -2,10 +2,12 @@ package com.polyu.blockchain.chain.transaction;
 
 import com.polyu.blockchain.common.util.StringUtil;
 import lombok.Data;
+import lombok.ToString;
 
 import java.security.PublicKey;
 
 @Data
+@ToString
 public class Output {
 
     public String id;
