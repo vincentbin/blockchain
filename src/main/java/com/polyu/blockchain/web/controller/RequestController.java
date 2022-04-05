@@ -3,7 +3,7 @@ package com.polyu.blockchain.web.controller;
 
 import com.polyu.blockchain.common.vo.NewAccountVo;
 import com.polyu.blockchain.common.vo.TransferReqVo;
-import com.polyu.blockchain.common.wrapper.Result;
+import com.polyu.blockchain.common.wrapper.HTTPResult;
 import com.polyu.blockchain.web.service.RequestService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -22,28 +22,28 @@ public class RequestController {
     private RequestService blockChainService;
 
     @RequestMapping(value = "/obtainNewAccount")
-    public Result<NewAccountVo> getNewAccount() {
+    public HTTPResult<NewAccountVo> getNewAccount() {
         try {
             NewAccountVo newAccountVo = blockChainService.obtainNewAccount();
-            return Result.success(newAccountVo);
+            return HTTPResult.success(newAccountVo);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return HTTPResult.error(e.getMessage());
         }
     }
 
     @RequestMapping(value = "/queryBalance")
-    public Result<Float> queryBalance(@RequestParam String publicKey) {
+    public HTTPResult<Float> queryBalance(@RequestParam String publicKey) {
         publicKey = publicKey.replaceAll(" +","+");
         try {
             Float balance = blockChainService.getBalance(publicKey);
-            return Result.success(balance);
+            return HTTPResult.success(balance);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return HTTPResult.error(e.getMessage());
         }
     }
 
     @RequestMapping(value = "/transfer")
-    public Result<Boolean> transfer(@RequestBody TransferReqVo request) {
+    public HTTPResult<Boolean> transfer(@RequestBody TransferReqVo request) {
         try {
             new Thread(new Runnable() {
                 @Override
@@ -54,9 +54,9 @@ public class RequestController {
                             request.getValue());
                 }
             }).start();
-            return Result.success(true, "Server started to process.");
+            return HTTPResult.success(true, "Server started to process.");
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return HTTPResult.error(e.getMessage());
         }
     }
 
