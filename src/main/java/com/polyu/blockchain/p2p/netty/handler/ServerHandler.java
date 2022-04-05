@@ -1,4 +1,4 @@
-package com.polyu.blockchain.p2p.netty;
+package com.polyu.blockchain.p2p.netty.handler;
 
 import com.polyu.blockchain.chain.Block;
 import com.polyu.blockchain.chain.MainChain;
@@ -9,25 +9,31 @@ import com.polyu.blockchain.common.p2p.Handler;
 import com.polyu.blockchain.common.util.KeyUtil;
 import com.polyu.blockchain.common.wrapper.Message;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
+import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
 import com.polyu.blockchain.p2p.netty.server.BootStrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class ClientHandler extends ChannelInboundHandlerAdapter implements Handler {
-    private static final Logger logger = LoggerFactory.getLogger(BusinessHandler.class);
+/**
+ * netty handler
+ */
+public class ServerHandler extends ChannelInboundHandlerAdapter implements Handler {
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
+        Message message = new Message(true);
+        if (PeerServerConnectKeeper.isNeedSynChain()) {
+            message.setSynChain(true);
+        }
+        Channel ch = ctx.channel();
+        ch.writeAndFlush(message);
     }
 
     @Override
@@ -166,7 +172,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
                 @Override
                 public void run() {
                     // mine
-                    block.mineBlock(5);
+                    block.mineBlock(MainChain.getDifficulty());
                     // add to local chain
                     MainChain.add(block);
                     if (!MainChain.isChainValid()) {
@@ -198,11 +204,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
 
         // mine reply process
         if (message.isMineReply()) {
-            String uuid = message.getUuid();
-            if (!PeerServerConnectKeeper.getUuidSet().contains(uuid)) {
-                return;
-            }
-            PeerServerConnectKeeper.getUuidSet().remove(uuid);
             Block block = message.getContent();
             ArrayList<Transaction> transactions = block.getTransactions();
             for (Transaction transaction : transactions) {
@@ -225,8 +226,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             if (!MainChain.isChainValid()) {
                 ArrayList<Block> blockChain = MainChain.getBlockChain();
                 blockChain.remove(blockChain.size() - 1);
-                // unsuccessful -> continue to accept new reply
-                PeerServerConnectKeeper.getUuidSet().add(uuid);
                 return;
             }
             // update local UTXO
@@ -305,6 +304,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             Message message = new Message();
             message.setMineRequest(true);
             message.setUuid(uuid);
+
             ArrayList<Transaction> transactions = block.getTransactions();
             for (Transaction transaction : transactions) {
                 transaction.setSenderStr(KeyUtil.PublicKeyToString(transaction.getSender()));
@@ -322,15 +322,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
                     output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
                 }
             }
-
             message.setContent(block);
-            logger.info("peer active status: {}.", peer.isActive());
-            try {
-                ChannelFuture sync = peer.writeAndFlush(message).sync();
-                logger.error("sync = {}.", sync);
-            } catch (Exception e) {
-                logger.error("error message = {}.", e.getMessage());
-            }
+
+            peer.writeAndFlush(message);
         }
     }
 

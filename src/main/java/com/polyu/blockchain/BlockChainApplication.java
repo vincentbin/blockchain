@@ -21,7 +21,6 @@ public class BlockChainApplication {
             }
         }).start();
          */
-        KeyUtil.init();
         SpringApplication.run(BlockChainApplication.class, args);
     }
 }

@@ -6,6 +6,7 @@ import com.polyu.blockchain.chain.transaction.Output;
 import com.polyu.blockchain.chain.transaction.Transaction;
 import com.polyu.blockchain.chain.transaction.Wallet;
 import com.polyu.blockchain.common.util.KeyUtil;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class MainChain {
     public static ArrayList<Block> blockChain = new ArrayList<>();
     public static HashMap<String, Output> UTXOs = new HashMap<>();
 
-    private static int difficulty = 5;
+    private static final int difficulty = 5;
     private static Wallet walletA;
     private static Wallet walletB;
     public static Transaction genesisTransaction;
@@ -121,7 +122,8 @@ public class MainChain {
             }
             // compare previous hash and registered previous hash
             if (!previousBlock.hash.equals(currentBlock.previousHash)) {
-                log.info("Previous Hashes not equal");
+                log.error(blockChain.toString());
+                log.warn("Previous Hashes not equal");
                 return false;
             }
             // check if hash is solved
@@ -176,7 +178,7 @@ public class MainChain {
             }
 
         }
-        log.info("Blockchain is valid.");
+        log.info("blockchain is valid.");
         return true;
     }
 
@@ -195,5 +197,9 @@ public class MainChain {
 
     public static ArrayList<Block> getBlockChain() {
         return blockChain;
+    }
+
+    public static int getDifficulty() {
+        return difficulty;
     }
 }
