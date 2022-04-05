@@ -10,7 +10,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.NettyRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -12,7 +12,7 @@ import java.util.Base64;
 public class KeyUtil {
     private static final Logger log = LoggerFactory.getLogger(KeyUtil.class);
 
-    public static void init() {
+    static {
         Provider BC = new BouncyCastleProvider();
         try {
             keyFactory = KeyFactory.getInstance("ECDSA", BC);

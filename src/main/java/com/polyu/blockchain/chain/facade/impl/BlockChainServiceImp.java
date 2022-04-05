@@ -10,7 +10,7 @@ import com.polyu.blockchain.chain.transaction.Wallet;
 import com.polyu.blockchain.chain.facade.BlockChainService;
 import com.polyu.blockchain.common.util.KeyUtil;
 import com.polyu.blockchain.common.vo.NewAccountVo;
-import com.polyu.blockchain.p2p.netty.BusinessHandler;
+import com.polyu.blockchain.p2p.netty.handler.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class BlockChainServiceImp implements BlockChainService {
             return;
         }
         block.addTransaction(issuerWallet.sendFunds(KeyUtil.stringToPublicKey(to), amount));
-        BusinessHandler.mineBroadcast(block);
+        ServerHandler.mineBroadcast(block);
     }
 
     /**

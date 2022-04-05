@@ -1,10 +1,7 @@
 package com.polyu.blockchain.p2p.netty.client;
 
-import com.polyu.blockchain.common.serializer.KryoSerializer;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
-import com.polyu.blockchain.p2p.netty.BusinessHandler;
 import com.polyu.blockchain.p2p.netty.ClientChannelInitializer;
-import com.polyu.blockchain.p2p.netty.NettyChannelInitializer;
 import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
