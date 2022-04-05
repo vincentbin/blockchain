@@ -2,9 +2,11 @@ package com.polyu.blockchain.p2p.netty;
 
 import com.polyu.blockchain.chain.Block;
 import com.polyu.blockchain.chain.MainChain;
+import com.polyu.blockchain.chain.transaction.Input;
 import com.polyu.blockchain.chain.transaction.Output;
 import com.polyu.blockchain.chain.transaction.Transaction;
 import com.polyu.blockchain.common.p2p.Handler;
+import com.polyu.blockchain.common.util.KeyUtil;
 import com.polyu.blockchain.common.wrapper.Message;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
 import com.polyu.blockchain.p2p.netty.server.BootStrap;
@@ -39,9 +41,51 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             rep.setAddressReply(true);
 
             if (message.isSynChain()) {
-                rep.setBlockChain(MainChain.blockChain);
-                rep.setUTXOs(MainChain.UTXOs);
-                rep.setGenesisTransaction(MainChain.genesisTransaction);
+                ArrayList<Block> blockChain = MainChain.blockChain;
+                for (Block block : blockChain) {
+                    ArrayList<Transaction> transactions = block.getTransactions();
+                    for (Transaction transaction : transactions) {
+                        transaction.setSenderStr(KeyUtil.PublicKeyToString(transaction.getSender()));
+                        transaction.setRecipientStr(KeyUtil.PublicKeyToString(transaction.getRecipient()));
+
+                        ArrayList<Input> inputs = transaction.getInputs();
+                        ArrayList<Output> outputs = transaction.getOutputs();
+                        if (inputs != null) {
+                            for (Input input : inputs) {
+                                Output utxo = input.getUTXO();
+                                utxo.setRecipientStr(KeyUtil.PublicKeyToString(utxo.getRecipient()));
+                            }
+                        }
+                        for (Output output : outputs) {
+                            output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
+                        }
+                    }
+                }
+                rep.setBlockChain(blockChain);
+
+                HashMap<String, Output> utxOs = MainChain.UTXOs;
+                for (Map.Entry<String, Output> utox : utxOs.entrySet()) {
+                    Output output = utox.getValue();
+                    output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
+                }
+                rep.setUTXOs(utxOs);
+
+                Transaction genesisTransaction = MainChain.genesisTransaction;
+                genesisTransaction.setSenderStr(KeyUtil.PublicKeyToString(genesisTransaction.getSender()));
+                genesisTransaction.setRecipientStr(KeyUtil.PublicKeyToString(genesisTransaction.getRecipient()));
+                ArrayList<Input> inputs = genesisTransaction.getInputs();
+                ArrayList<Output> outputs = genesisTransaction.getOutputs();
+                if (inputs != null) {
+                    for (Input input : inputs) {
+                        Output utxo = input.getUTXO();
+                        utxo.setRecipientStr(KeyUtil.PublicKeyToString(utxo.getRecipient()));
+                    }
+                }
+                for (Output output : outputs) {
+                    output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
+                }
+                rep.setGenesisTransaction(genesisTransaction);
+
                 rep.setSynChain(true);
             }
             ctx.channel().writeAndFlush(rep);
@@ -50,9 +94,50 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
         if (message.isAddressReply()) {
             PeerServerConnectKeeper.add(ctx.channel(), new RegistryPackage(message.getIp(), message.getPort()));
             if (message.isSynChain()) {
-                MainChain.blockChain = message.getBlockChain();
-                MainChain.UTXOs = message.getUTXOs();
-                MainChain.genesisTransaction = message.getGenesisTransaction();
+                ArrayList<Block> blockChain = message.getBlockChain();
+                for (Block block : blockChain) {
+                    ArrayList<Transaction> transactions = block.getTransactions();
+                    for (Transaction transaction : transactions) {
+                        transaction.setSender(KeyUtil.stringToPublicKey(transaction.getSenderStr()));
+                        transaction.setRecipient(KeyUtil.stringToPublicKey(transaction.getRecipientStr()));
+
+                        ArrayList<Input> inputs = transaction.getInputs();
+                        ArrayList<Output> outputs = transaction.getOutputs();
+                        if (inputs != null) {
+                            for (Input input : inputs) {
+                                Output utxo = input.getUTXO();
+                                utxo.setRecipient(KeyUtil.stringToPublicKey(utxo.getRecipientStr()));
+                            }
+                        }
+                        for (Output output : outputs) {
+                            output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                        }
+                    }
+                }
+                MainChain.blockChain = blockChain;
+
+                HashMap<String, Output> utxOs = message.getUTXOs();
+                for (Map.Entry<String, Output> utxo : utxOs.entrySet()) {
+                    Output output = utxo.getValue();
+                    output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                }
+                MainChain.UTXOs = utxOs;
+
+                Transaction genesisTransaction = message.getGenesisTransaction();
+                genesisTransaction.setSender(KeyUtil.stringToPublicKey(genesisTransaction.senderStr));
+                genesisTransaction.setRecipient(KeyUtil.stringToPublicKey(genesisTransaction.recipientStr));
+                ArrayList<Input> inputs = genesisTransaction.getInputs();
+                ArrayList<Output> outputs = genesisTransaction.getOutputs();
+                if (inputs != null) {
+                    for (Input input : inputs) {
+                        Output output = input.getUTXO();
+                        output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                    }
+                }
+                for (Output output : outputs) {
+                    output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                }
+                MainChain.genesisTransaction = genesisTransaction;
             }
             return;
         }
@@ -60,6 +145,23 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
         if (message.isMineRequest()) {
             PeerServerConnectKeeper.getUuidSet().add(message.getUuid());
             Block block = message.getContent();
+            ArrayList<Transaction> transactions = block.getTransactions();
+            for (Transaction transaction : transactions) {
+                transaction.setSender(KeyUtil.stringToPublicKey(transaction.getSenderStr()));
+                transaction.setRecipient(KeyUtil.stringToPublicKey(transaction.getRecipientStr()));
+
+                ArrayList<Input> inputs = transaction.getInputs();
+                ArrayList<Output> outputs = transaction.getOutputs();
+                if (inputs != null) {
+                    for (Input input : inputs) {
+                        Output output = input.getUTXO();
+                        output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                    }
+                }
+                for (Output output : outputs) {
+                    output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                }
+            }
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -71,6 +173,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
                         ArrayList<Block> blockChain = MainChain.getBlockChain();
                         blockChain.remove(blockChain.size() - 1);
                         return;
+                    }
+                    for (Transaction t : block.getTransactions()) {
+                        t.updateLocalUTXO();
                     }
 
                     // success added, remove id, avoid others' result modify local chain
@@ -90,6 +195,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             }).start();
             return;
         }
+
         // mine reply process
         if (message.isMineReply()) {
             String uuid = message.getUuid();
@@ -98,6 +204,23 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             }
             PeerServerConnectKeeper.getUuidSet().remove(uuid);
             Block block = message.getContent();
+            ArrayList<Transaction> transactions = block.getTransactions();
+            for (Transaction transaction : transactions) {
+                transaction.setSender(KeyUtil.stringToPublicKey(transaction.getSenderStr()));
+                transaction.setRecipient(KeyUtil.stringToPublicKey(transaction.getRecipientStr()));
+
+                ArrayList<Input> inputs = transaction.getInputs();
+                ArrayList<Output> outputs = transaction.getOutputs();
+                if (inputs != null) {
+                    for (Input input : inputs) {
+                        Output output = input.getUTXO();
+                        output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                    }
+                }
+                for (Output output : outputs) {
+                    output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                }
+            }
             MainChain.add(block);
             if (!MainChain.isChainValid()) {
                 ArrayList<Block> blockChain = MainChain.getBlockChain();
@@ -106,19 +229,58 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
                 PeerServerConnectKeeper.getUuidSet().add(uuid);
                 return;
             }
-            ArrayList<Transaction> transactions = block.getTransactions();
             // update local UTXO
             for (Transaction t : transactions) {
-                t.processTransaction();
+                t.updateLocalUTXO();
             }
             return;
         }
         // syn chain process
         if (message.isSynChain()) {
-            MainChain.blockChain = message.getBlockChain();
-            MainChain.UTXOs = message.getUTXOs();
-            MainChain.genesisTransaction = message.getGenesisTransaction();
-            return;
+            ArrayList<Block> blockChain = message.getBlockChain();
+            for (Block block : blockChain) {
+                ArrayList<Transaction> transactions = block.getTransactions();
+                for (Transaction transaction : transactions) {
+                    transaction.setSender(KeyUtil.stringToPublicKey(transaction.getSenderStr()));
+                    transaction.setRecipient(KeyUtil.stringToPublicKey(transaction.getRecipientStr()));
+
+                    ArrayList<Input> inputs = transaction.getInputs();
+                    ArrayList<Output> outputs = transaction.getOutputs();
+                    if (inputs != null) {
+                        for (Input input : inputs) {
+                            Output utxo = input.getUTXO();
+                            utxo.setRecipient(KeyUtil.stringToPublicKey(utxo.getRecipientStr()));
+                        }
+                    }
+                    for (Output output : outputs) {
+                        output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                    }
+                }
+            }
+            MainChain.blockChain = blockChain;
+
+            HashMap<String, Output> utxOs = message.getUTXOs();
+            for (Map.Entry<String, Output> utxo : utxOs.entrySet()) {
+                Output output = utxo.getValue();
+                output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+            }
+            MainChain.UTXOs = utxOs;
+
+            Transaction genesisTransaction = message.getGenesisTransaction();
+            genesisTransaction.setSender(KeyUtil.stringToPublicKey(genesisTransaction.senderStr));
+            genesisTransaction.setRecipient(KeyUtil.stringToPublicKey(genesisTransaction.recipientStr));
+            ArrayList<Input> inputs = genesisTransaction.getInputs();
+            ArrayList<Output> outputs = genesisTransaction.getOutputs();
+            if (inputs != null) {
+                for (Input input : inputs) {
+                    Output output = input.getUTXO();
+                    output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+                }
+            }
+            for (Output output : outputs) {
+                output.setRecipient(KeyUtil.stringToPublicKey(output.getRecipientStr()));
+            }
+            MainChain.genesisTransaction = genesisTransaction;
         }
     }
 
@@ -143,31 +305,32 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
             Message message = new Message();
             message.setMineRequest(true);
             message.setUuid(uuid);
+            ArrayList<Transaction> transactions = block.getTransactions();
+            for (Transaction transaction : transactions) {
+                transaction.setSenderStr(KeyUtil.PublicKeyToString(transaction.getSender()));
+                transaction.setRecipientStr(KeyUtil.PublicKeyToString(transaction.getRecipient()));
+
+                ArrayList<Input> inputs = transaction.getInputs();
+                ArrayList<Output> outputs = transaction.getOutputs();
+                if (inputs != null) {
+                    for (Input input : inputs) {
+                        Output output = input.getUTXO();
+                        output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
+                    }
+                }
+                for (Output output : outputs) {
+                    output.setRecipientStr(KeyUtil.PublicKeyToString(output.getRecipient()));
+                }
+            }
+
             message.setContent(block);
-            System.out.println(peer.isActive());
+            logger.info("peer active status: {}.", peer.isActive());
             try {
                 ChannelFuture sync = peer.writeAndFlush(message).sync();
-                System.out.println("sync = " + sync);
+                logger.error("sync = {}.", sync);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error("error message = {}.", e.getMessage());
             }
-        }
-    }
-
-    /**
-     * syn chain
-     */
-    public static void synChain(ArrayList<Block> blockChain, HashMap<String, Output> UTXOs, Transaction genesisTransaction) {
-        Map<RegistryPackage, Channel> map = PeerServerConnectKeeper.getMap();
-        for (RegistryPackage key : map.keySet()) {
-            Channel peer = map.get(key);
-            Message message = new Message();
-            message.setSynChain(true);
-
-            message.setBlockChain(blockChain);
-            message.setUTXOs(UTXOs);
-            message.setGenesisTransaction(genesisTransaction);
-            peer.writeAndFlush(message);
         }
     }
 

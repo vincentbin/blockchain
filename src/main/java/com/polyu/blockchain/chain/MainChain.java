@@ -164,11 +164,11 @@ public class MainChain {
                     tempUTXOs.put(output.id, output);
                 }
 
-                if (currentTransaction.outputs.get(0).recipient != currentTransaction.recipient) {
+                if (!currentTransaction.outputs.get(0).recipient.equals(currentTransaction.recipient)) {
                     log.info("Transaction({}) output recipient is not who it should be", t);
                     return false;
                 }
-                if (currentTransaction.outputs.get(1).recipient != currentTransaction.sender) {
+                if (!currentTransaction.outputs.get(1).recipient.equals(currentTransaction.sender)) {
                     log.info("Transaction({}) output 'change' is not sender.", t);
                     return false;
                 }

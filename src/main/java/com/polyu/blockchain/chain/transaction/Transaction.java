@@ -4,6 +4,7 @@ import com.polyu.blockchain.chain.MainChain;
 import com.polyu.blockchain.common.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
+@ToString
 public class Transaction {
     private static final Logger log = LoggerFactory.getLogger(Transaction.class);
 
@@ -26,12 +28,16 @@ public class Transaction {
     /**
      * sender's public key
      */
-    public PublicKey sender;
+    public transient PublicKey sender;
+
+    public String senderStr;
 
     /**
      * recipient's public key
      */
-    public PublicKey recipient;
+    public transient PublicKey recipient;
+
+    public String recipientStr;
 
     /**
      * transaction amount
@@ -43,7 +49,7 @@ public class Transaction {
      */
     private byte[] signature;
 
-    public ArrayList<Input> inputs;
+    public ArrayList<Input> inputs = new ArrayList<>();
     public ArrayList<Output> outputs = new ArrayList<>();
 
     private static final float minimumTransaction = 0.1f;
@@ -98,6 +104,23 @@ public class Transaction {
         }
 
         return true;
+    }
+
+    /**
+     * after mining update
+     */
+    public void updateLocalUTXO() {
+        for (Output o : outputs) {
+            MainChain.getUTXOs().put(o.id, o);
+        }
+
+        // Remove transaction inputs from UTXO lists as spent:
+        for (Input i : inputs) {
+            if (i.UTXO == null) {
+                continue; // if Transaction can't be found skip it
+            }
+            MainChain.getUTXOs().remove(i.UTXO.id);
+        }
     }
 
     public float getInputsValue() {

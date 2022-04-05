@@ -1,5 +1,6 @@
 package com.polyu.blockchain;
 
+import com.polyu.blockchain.common.util.KeyUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,6 +21,7 @@ public class BlockChainApplication {
             }
         }).start();
          */
+        KeyUtil.init();
         SpringApplication.run(BlockChainApplication.class, args);
     }
 }
