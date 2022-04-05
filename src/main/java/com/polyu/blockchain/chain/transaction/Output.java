@@ -15,7 +15,9 @@ public class Output {
     /**
      * new owner of these coins.
      */
-    public PublicKey recipient;
+    public transient PublicKey recipient;
+
+    public String recipientStr;
 
     /**
      * the amount of coins they own

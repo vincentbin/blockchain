@@ -1,6 +1,7 @@
 package com.polyu.blockchain.common.util;
 
 import com.polyu.blockchain.chain.transaction.Transaction;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public class StringUtil {
     private static final String ENCODE_ALG = "SHA-256";
     private static final String CODE_FORMAT = "UTF-8";
     private static final String KEY_PAIR_ALG = "ECDSA";
-    private static final String KEY_PAIR_ALG_PROVIDER = "BC";
+    private static Provider BC = new BouncyCastleProvider();
 
     public static String applySha256(String input) {
         StringBuilder hexString;
@@ -41,12 +42,11 @@ public class StringUtil {
     public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
         byte[] output;
         try {
-            Signature dsa = Signature.getInstance(KEY_PAIR_ALG, KEY_PAIR_ALG_PROVIDER);
+            Signature dsa = Signature.getInstance(KEY_PAIR_ALG, BC);
             dsa.initSign(privateKey);
             byte[] strByte = input.getBytes();
             dsa.update(strByte);
-            byte[] realSig = dsa.sign();
-            output = realSig;
+            output = dsa.sign();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public class StringUtil {
     //Verifies a String signature
     public static boolean verifyECDSASig(PublicKey publicKey, String data, byte[] signature) {
         try {
-            Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
+            Signature ecdsaVerify = Signature.getInstance("ECDSA", BC);
             ecdsaVerify.initVerify(publicKey);
             ecdsaVerify.update(data.getBytes());
             return ecdsaVerify.verify(signature);
@@ -92,11 +92,7 @@ public class StringUtil {
             previousTreeLayer = treeLayer;
         }
 
-        String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
-        return merkleRoot;
+        return (treeLayer.size() == 1) ? treeLayer.get(0) : "";
     }
 
-    public static void main(String[] args) {
-        log.info(StringUtil.applySha256("123"));
-    }
 }
