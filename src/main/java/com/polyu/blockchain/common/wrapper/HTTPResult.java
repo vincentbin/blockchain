@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @Data
-public class Result<T> {
+public class HTTPResult<T> {
 
     private String msg;
     private T data;
@@ -16,8 +16,8 @@ public class Result<T> {
      * @param <T> data clazz
      * @return
      */
-    public static <T> Result<T> success(T data) {
-        return new Result<T>(data);
+    public static <T> HTTPResult<T> success(T data) {
+        return new HTTPResult<T>(data);
     }
 
     /**
@@ -27,8 +27,8 @@ public class Result<T> {
      * @param <T> data clazz
      * @return Result
      */
-    public static <T> Result<T> success(T data, String msg) {
-        Result<T> res = new Result<>(data);
+    public static <T> HTTPResult<T> success(T data, String msg) {
+        HTTPResult<T> res = new HTTPResult<>(data);
         res.setMsg(msg);
         return res;
     }
@@ -39,15 +39,15 @@ public class Result<T> {
      * @param <T> data clazz
      * @return
      */
-    public static <T> Result<T> error(String codeMsg) {
-        return new Result<T>(codeMsg);
+    public static <T> HTTPResult<T> error(String codeMsg) {
+        return new HTTPResult<T>(codeMsg);
     }
 
-    private Result(T data) {
+    private HTTPResult(T data) {
         this.data = data;
     }
 
-    private Result(String msg) {
+    private HTTPResult(String msg) {
         this.msg = msg;
     }
 
