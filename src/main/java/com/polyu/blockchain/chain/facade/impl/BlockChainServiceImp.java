@@ -13,11 +13,13 @@ import com.polyu.blockchain.common.vo.NewAccountVo;
 import com.polyu.blockchain.p2p.netty.handler.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 
+@Service
 public class BlockChainServiceImp implements BlockChainService {
     private static final Logger log = LoggerFactory.getLogger(BlockChainServiceImp.class);
 

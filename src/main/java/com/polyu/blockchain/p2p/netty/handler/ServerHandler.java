@@ -5,7 +5,6 @@ import com.polyu.blockchain.chain.MainChain;
 import com.polyu.blockchain.chain.transaction.Input;
 import com.polyu.blockchain.chain.transaction.Output;
 import com.polyu.blockchain.chain.transaction.Transaction;
-import com.polyu.blockchain.common.p2p.Handler;
 import com.polyu.blockchain.common.util.KeyUtil;
 import com.polyu.blockchain.common.wrapper.Message;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
@@ -20,9 +19,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * netty handler
+ * server handler
  */
-public class ServerHandler extends ChannelInboundHandlerAdapter implements Handler {
+public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Override
@@ -328,8 +327,4 @@ public class ServerHandler extends ChannelInboundHandlerAdapter implements Handl
         }
     }
 
-    @Override
-    public void processBroadcast(Object o) {
-        mineBroadcast((Block) o);
-    }
 }
