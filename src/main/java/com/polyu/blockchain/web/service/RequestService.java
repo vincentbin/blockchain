@@ -2,15 +2,16 @@ package com.polyu.blockchain.web.service;
 
 
 import com.polyu.blockchain.chain.facade.BlockChainService;
-import com.polyu.blockchain.chain.facade.impl.BlockChainServiceImp;
 import com.polyu.blockchain.common.vo.NewAccountVo;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@AllArgsConstructor
 public class RequestService {
 
-    private BlockChainService blockChainService = new BlockChainServiceImp();
+    private BlockChainService blockChainService;
 
     public NewAccountVo obtainNewAccount() {
         return blockChainService.obtainNewAccount();

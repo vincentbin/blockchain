@@ -5,7 +5,6 @@ import com.polyu.blockchain.chain.MainChain;
 import com.polyu.blockchain.chain.transaction.Input;
 import com.polyu.blockchain.chain.transaction.Output;
 import com.polyu.blockchain.chain.transaction.Transaction;
-import com.polyu.blockchain.common.p2p.Handler;
 import com.polyu.blockchain.common.util.KeyUtil;
 import com.polyu.blockchain.common.wrapper.Message;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
@@ -23,7 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ClientHandler extends ChannelInboundHandlerAdapter implements Handler {
+/**
+ * client handler
+ */
+public class ClientHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Override
@@ -328,8 +330,4 @@ public class ClientHandler extends ChannelInboundHandlerAdapter implements Handl
         }
     }
 
-    @Override
-    public void processBroadcast(Object o) {
-        mineBroadcast((Block) o);
-    }
 }
