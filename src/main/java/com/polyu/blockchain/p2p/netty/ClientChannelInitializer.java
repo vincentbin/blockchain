@@ -6,12 +6,11 @@ import com.polyu.blockchain.common.serializer.KryoSerializer;
 import com.polyu.blockchain.p2p.netty.handler.ClientHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-
 import io.netty.channel.socket.SocketChannel;
 
 public class ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
     @Override
-    protected void initChannel(SocketChannel ch) throws Exception {
+    protected void initChannel(SocketChannel ch) {
         ChannelPipeline cp = ch.pipeline();
         cp.addLast(new Decoder(KryoSerializer.getInstance()));
         cp.addLast(new Encoder(KryoSerializer.getInstance()));

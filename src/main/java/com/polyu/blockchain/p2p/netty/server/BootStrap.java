@@ -1,7 +1,7 @@
 package com.polyu.blockchain.p2p.netty.server;
 
 import com.polyu.blockchain.chain.facade.impl.BlockChainServiceImp;
-import com.polyu.blockchain.p2p.netty.NettyChannelInitializer;
+import com.polyu.blockchain.p2p.netty.ServerChannelInitializer;
 import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
 import com.polyu.blockchain.p2p.netty.RegistryCenter;
 import io.netty.bootstrap.ServerBootstrap;
@@ -31,7 +31,7 @@ public class BootStrap implements Runnable {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new NettyChannelInitializer())
+                    .childHandler(new ServerChannelInitializer())
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
