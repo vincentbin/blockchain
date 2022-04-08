@@ -3,7 +3,7 @@ package com.polyu.blockchain.p2p.netty.server;
 import com.polyu.blockchain.chain.facade.impl.BlockChainServiceImp;
 import com.polyu.blockchain.p2p.netty.ServerChannelInitializer;
 import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
-import com.polyu.blockchain.p2p.netty.RegistryCenter;
+import com.polyu.blockchain.p2p.registry.RegistryCenter;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;

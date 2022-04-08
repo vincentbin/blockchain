@@ -84,7 +84,7 @@ public class Transaction {
             return false;
         }
 
-        //Generate transaction outputs:
+        // Generate transaction outputs:
         float leftOver = getInputsValue() - value; //get value of inputs then the left over change:
         transactionId = calculateHash();
         outputs.add(new Output(this.recipient, value, transactionId)); //send value to recipient
