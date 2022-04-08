@@ -27,6 +27,7 @@ public class RequestController {
             NewAccountVo newAccountVo = blockChainService.obtainNewAccount();
             return HTTPResult.success(newAccountVo);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             return HTTPResult.error(e.getMessage());
         }
     }
@@ -38,6 +39,7 @@ public class RequestController {
             Float balance = blockChainService.getBalance(publicKey);
             return HTTPResult.success(balance);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             return HTTPResult.error(e.getMessage());
         }
     }
@@ -56,6 +58,7 @@ public class RequestController {
             }).start();
             return HTTPResult.success(true, "Server started to process.");
         } catch (Exception e) {
+            logger.error(e.getMessage());
             return HTTPResult.error(e.getMessage());
         }
     }

@@ -103,6 +103,10 @@ public class MainChain {
 
     }
 
+    /**
+     * verify chain
+     * @return bool
+     */
     public static Boolean isChainValid() {
         Block currentBlock;
         Block previousBlock;
@@ -115,17 +119,20 @@ public class MainChain {
 
             currentBlock = blockChain.get(i);
             previousBlock = blockChain.get(i - 1);
+
             // compare registered hash and calculated hash:
             if (!currentBlock.hash.equals(currentBlock.calculateHash())) {
                 log.info("Current Hashes not equal");
                 return false;
             }
+
             // compare previous hash and registered previous hash
             if (!previousBlock.hash.equals(currentBlock.previousHash)) {
                 log.error(blockChain.toString());
                 log.warn("Previous Hashes not equal");
                 return false;
             }
+
             // check if hash is solved
             if (currentBlock.hash == null || !currentBlock.hash.substring(0, difficulty).equals(hashTarget)) {
                 log.info("This block hasn't been mined");

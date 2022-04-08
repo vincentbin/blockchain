@@ -18,6 +18,11 @@ public class StringUtil {
     private static final String KEY_PAIR_ALG = "ECDSA";
     private static Provider BC = new BouncyCastleProvider();
 
+    /**
+     * obtain SHA-256 hash result
+     * @param input
+     * @return
+     */
     public static String applySha256(String input) {
         StringBuilder hexString;
         try {
@@ -32,13 +37,18 @@ public class StringUtil {
                 hexString.append(hex);
             }
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
         return hexString.toString();
     }
 
-
-    //Applies ECDSA Signature and returns the result ( as bytes ).
+    /**
+     * applies ECDSA Signature and returns the result (byte arr).
+     * @param privateKey
+     * @param input
+     * @return
+     */
     public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
         byte[] output;
         try {
@@ -48,12 +58,19 @@ public class StringUtil {
             dsa.update(strByte);
             output = dsa.sign();
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
         return output;
     }
 
-    //Verifies a String signature
+    /**
+     * verifies String signature
+     * @param publicKey
+     * @param data
+     * @param signature
+     * @return
+     */
     public static boolean verifyECDSASig(PublicKey publicKey, String data, byte[] signature) {
         try {
             Signature ecdsaVerify = Signature.getInstance("ECDSA", BC);
@@ -61,6 +78,7 @@ public class StringUtil {
             ecdsaVerify.update(data.getBytes());
             return ecdsaVerify.verify(signature);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -74,6 +92,11 @@ public class StringUtil {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
+    /**
+     * construct merkleRoot according to transaction id
+     * @param transactions transactions in block
+     * @return String
+     */
     public static String getMerkleRoot(ArrayList<Transaction> transactions) {
         int count = transactions.size();
 
