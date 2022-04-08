@@ -1,9 +1,9 @@
-package com.polyu.blockchain.p2p.netty;
+package com.polyu.blockchain.p2p.registry;
 
 import com.polyu.blockchain.common.config.NameSpaceEnum;
 import com.polyu.blockchain.common.wrapper.RegistryPackage;
+import com.polyu.blockchain.p2p.netty.PeerServerConnectKeeper;
 import com.polyu.blockchain.p2p.netty.client.Connector;
-import com.polyu.blockchain.p2p.registry.CuratorClient;
 import io.netty.channel.Channel;
 import lombok.SneakyThrows;
 import org.apache.curator.framework.CuratorFramework;
