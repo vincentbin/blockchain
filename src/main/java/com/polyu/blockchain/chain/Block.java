@@ -17,7 +17,7 @@ public class Block {
     public String hash;
     public String previousHash;
     public String merkleRoot;
-    public ArrayList<Transaction> transactions = new ArrayList<>(); //our data will be a simple message.
+    public ArrayList<Transaction> transactions = new ArrayList<>();
     public long timeStamp;
     public int nonce;
 
@@ -54,7 +54,6 @@ public class Block {
      * @return success?
      */
     public boolean addTransaction(Transaction transaction) {
-        // process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null) {
             return false;
         }
